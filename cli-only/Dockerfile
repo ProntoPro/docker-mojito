@@ -6,7 +6,7 @@ RUN curl -L https://github.com/box/mojito/releases/download/v${MOJITO_VERSION}/m
 
 FROM openjdk:8-jre as production
 
-LABEL maintainer="michele@zuccala.com"
+LABEL maintainer="ProntoPro <devops@prontopro.it>"
 
 COPY --from=0 /tmp/cli.jar /opt/mojito/cli.jar
 

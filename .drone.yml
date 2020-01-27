@@ -1,0 +1,56 @@
+pipeline:
+  test-image-build-cli:
+    image: plugins/docker
+    dry_run: true
+    purge: true
+    repo: prontopro/mojito
+    dockerfile: cli-only/Dockerfile
+    when:
+      event: [ pull_request ]
+
+  test-image-build-full:
+    image: plugins/docker
+    dry_run: true
+    purge: true
+    repo: prontopro/mojito
+    dockerfile: full/Dockerfile
+    when:
+      event: [ pull_request ]
+
+  publish-image:
+    image: plugins/docker
+    repo: prontopro/mojito
+    dockerfile: Dockerfile
+    secrets: [docker_username, docker_password]
+    tags:
+      - latest
+      - ${DRONE_TAG}
+    when:
+      event:
+        - tag
+
+  notify-image-prod:
+    image: plugins/slack
+    channel: tech-artifacts
+    username: drone
+    secrets:
+      - slack_webhook
+    template: Mojito docker images for ${DRONE_TAG} published.
+    when:
+      event:
+        - tag
+      status:
+        - success
+
+  notify-image-prod-failure:
+    image: plugins/slack
+    channel: tech-artifacts-fail
+    username: drone
+    secrets:
+      - slack_webhook
+    template: Mojito docker images for ${DRONE_TAG} failed to be published.
+    when:
+      event:
+        - tag
+      status:
+        - failure
